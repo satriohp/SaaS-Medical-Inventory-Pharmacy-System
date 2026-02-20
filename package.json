@@ -1,0 +1,37 @@
+{
+  "name": "saas-medical-inventory-pharmacy-system",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Multi-tenant SaaS Medical Inventory & Pharmacy Management System",
+  "scripts": {
+    "dev:api": "cd apps/api && npm run dev",
+    "dev:web": "cd apps/web && npm run dev",
+    "build:api": "cd apps/api && npm run build",
+    "build:web": "cd apps/web && npm run build",
+    "db:migrate": "npx prisma migrate dev",
+    "db:generate": "npx prisma generate",
+    "db:push": "npx prisma db push",
+    "db:studio": "npx prisma studio",
+    "db:seed": "npx ts-node prisma/seed.ts",
+    "lint": "echo \"lint all\"",
+    "clean": "rimraf apps/*/dist apps/*/node_modules packages/*/dist packages/*/node_modules"
+  },
+  "keywords": [
+    "saas",
+    "medical",
+    "inventory",
+    "pharmacy",
+    "multi-tenant"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "prisma": "^6.19.2",
+    "typescript": "^5.9.3",
+    "ts-node": "^10.9.2",
+    "rimraf": "^5.0.5"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.2"
+  }
+}

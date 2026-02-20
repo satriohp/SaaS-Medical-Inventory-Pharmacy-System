@@ -1,0 +1,211 @@
+// ============================================================================
+// SaaS Medical Inventory & Pharmacy System — Prisma Schema
+// PostgreSQL ONLY · Multi-Tenant · All tables scoped to tenantId
+// ============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// TENANT
+// ============================================================================
+
+model Tenant {
+  id        String     @id @default(cuid())
+  name      String
+  slug      String     @unique
+  plan      TenantPlan @default(BASIC)
+  isActive  Boolean    @default(true)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  users      TenantUser[]
+  products   Product[]
+  inventories Inventory[]
+  movements  StockMovement[]
+  auditLogs  AuditLog[]
+}
+
+enum TenantPlan {
+  BASIC
+  PROFESSIONAL
+  ENTERPRISE
+}
+
+// ============================================================================
+// USER & RBAC
+// ============================================================================
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tenants       TenantUser[]
+  refreshTokens RefreshToken[]
+}
+
+model TenantUser {
+  id        String   @id @default(cuid())
+  userId    String
+  tenantId  String
+  role      Role     @default(STAFF)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tenantId])
+  @@index([tenantId])
+  @@index([userId])
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  PHARMACIST
+  STAFF
+}
+
+// ============================================================================
+// PRODUCT / MEDICINE
+// ============================================================================
+
+model Product {
+  id          String   @id @default(cuid())
+  tenantId    String
+  name        String
+  sku         String
+  category    String?
+  unit        String   @default("pcs")
+  description String?
+  minStock    Int      @default(10)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant         Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  inventoryItems InventoryItem[]
+  movements      StockMovement[]
+
+  @@unique([tenantId, sku])
+  @@index([tenantId])
+  @@index([tenantId, name])
+}
+
+// ============================================================================
+// INVENTORY (Current State Snapshot)
+// ============================================================================
+
+model Inventory {
+  id        String   @id @default(cuid())
+  tenantId  String
+  name      String   @default("Main Warehouse")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  items  InventoryItem[]
+
+  @@index([tenantId])
+}
+
+model InventoryItem {
+  id          String    @id @default(cuid())
+  inventoryId String
+  productId   String
+  quantity    Int       @default(0)
+  batchNumber String?
+  expiryDate  DateTime?
+  updatedAt   DateTime  @updatedAt
+
+  inventory Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([inventoryId, productId, batchNumber])
+  @@index([productId])
+  @@index([inventoryId])
+}
+
+// ============================================================================
+// STOCK MOVEMENT (Immutable Ledger)
+// ============================================================================
+
+model StockMovement {
+  id          String       @id @default(cuid())
+  tenantId    String
+  productId   String
+  type        MovementType
+  quantity    Int
+  batchNumber String?
+  expiryDate  DateTime?
+  reference   String?
+  notes       String?
+  performedBy String
+  createdAt   DateTime     @default(now())
+
+  tenant  Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  // NO updatedAt — records are IMMUTABLE
+  @@index([tenantId])
+  @@index([productId])
+  @@index([tenantId, createdAt])
+}
+
+enum MovementType {
+  IN
+  OUT
+  ADJUSTMENT
+  RETURN
+  EXPIRED
+}
+
+// ============================================================================
+// AUDIT LOG
+// ============================================================================
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  tenantId  String
+  userId    String
+  action    String
+  entity    String
+  entityId  String?
+  before    Json?
+  after     Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([tenantId, createdAt])
+  @@index([userId])
+}
