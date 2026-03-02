@@ -28,6 +28,7 @@ The system is built with SaaS architecture principles:
 
 ## Architecture
 Monorepo structure:
+
 apps/
 ├── api (NestJS backend)
 └── web (Next.js frontend)
@@ -122,4 +123,5 @@ prisma/
 - Stock movement tracking
 - Audit logging
 - Notification module (in progress)
+
 
