@@ -9,10 +9,6 @@ import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
 import { INVENTORY_EVENTS, StockAlertPayload } from '../inventory/inventory.service';
 
-/**
- * NotificationGateway — WebSocket gateway for real-time inventory alerts.
- * Clients join tenant-specific rooms to receive scoped notifications.
- */
 @WebSocketGateway({
     cors: {
         origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
@@ -20,8 +16,7 @@ import { INVENTORY_EVENTS, StockAlertPayload } from '../inventory/inventory.serv
     },
     namespace: '/notifications',
 })
-export class NotificationGateway
-    implements OnGatewayConnection, OnGatewayDisconnect {
+export class NotificationGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly logger = new Logger(NotificationGateway.name);
 
     @WebSocketServer()
@@ -46,11 +41,11 @@ export class NotificationGateway
     handleLowStock(payload: StockAlertPayload): void {
         this.server.to(`tenant-${payload.tenantId}`).emit('stock:low', {
             type: 'LOW_STOCK',
-            message: `Low stock alert: ${payload.productName} (${payload.productSku}) — ${payload.currentQuantity} remaining (min: ${payload.minStock})`,
+            message: `Low stock: ${payload.productName} (${payload.productSku}) — ${payload.currentQuantity} remaining`,
             data: payload,
             timestamp: new Date().toISOString(),
         });
-        this.logger.warn(`Low stock alert emitted for tenant ${payload.tenantId}`);
+        this.logger.warn(`Low stock emitted for tenant ${payload.tenantId}`);
     }
 
     @OnEvent(INVENTORY_EVENTS.OUT_OF_STOCK)
@@ -61,7 +56,7 @@ export class NotificationGateway
             data: payload,
             timestamp: new Date().toISOString(),
         });
-        this.logger.warn(`Out of stock alert emitted for tenant ${payload.tenantId}`);
+        this.logger.warn(`Out of stock emitted for tenant ${payload.tenantId}`);
     }
 
     @OnEvent(INVENTORY_EVENTS.STOCK_UPDATED)

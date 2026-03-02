@@ -6,10 +6,12 @@ import { AuthRepository } from './auth.repository';
 
 @Module({
     imports: [
-        JwtModule.register({
+        JwtModule.registerAsync({
             global: true,
-            secret: process.env.JWT_SECRET,
-            signOptions: { expiresIn: process.env.JWT_EXPIRY || '15m' },
+            useFactory: () => ({
+                secret: process.env.JWT_SECRET || 'fallback-secret-change-in-production',
+                signOptions: { expiresIn: '15m' } as const,
+            }),
         }),
     ],
     controllers: [AuthController],

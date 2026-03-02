@@ -9,10 +9,6 @@ import { Observable, tap } from 'rxjs';
 import { Request } from 'express';
 import { PrismaService } from '../../prisma/prisma.service';
 
-/**
- * LoggingInterceptor — creates audit log entries for ALL write operations.
- * Runs AFTER the response is generated (tap operator).
- */
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
     private readonly logger = new Logger(LoggingInterceptor.name);
@@ -34,7 +30,6 @@ export class LoggingInterceptor implements NestInterceptor {
                         `[${method}] ${url} → ${duration}ms | User: ${user?.sub || 'anonymous'}`,
                     );
 
-                    // Only audit write operations for authenticated users with tenant context
                     if (this.WRITE_METHODS.includes(method) && user?.sub && user?.tenantId) {
                         try {
                             await this.prisma.auditLog.create({
@@ -50,7 +45,6 @@ export class LoggingInterceptor implements NestInterceptor {
                                 },
                             });
                         } catch (error) {
-                            // Never let audit log failure break the main flow
                             this.logger.error('Failed to create audit log', error);
                         }
                     }
@@ -65,13 +59,8 @@ export class LoggingInterceptor implements NestInterceptor {
         );
     }
 
-    /**
-     * Extract the primary entity name from URL path.
-     * e.g., /api/products/123 → "products"
-     */
     private extractEntity(url: string): string {
         const segments = url.split('/').filter(Boolean);
-        // Skip 'api' prefix if present
         const entityIndex = segments[0] === 'api' ? 1 : 0;
         return segments[entityIndex] || 'unknown';
     }

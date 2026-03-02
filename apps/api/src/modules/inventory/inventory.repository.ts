@@ -30,7 +30,6 @@ export class InventoryRepository {
 
         const inventory = await this.findOrCreateDefault(tenantId);
 
-        // Build WHERE condition to join with product for filtering
         const whereCondition: any = {
             inventoryId: inventory.id,
         };
@@ -67,7 +66,6 @@ export class InventoryRepository {
             this.prisma.inventoryItem.count({ where: whereCondition }),
         ]);
 
-        // Filter low stock items if requested
         let filteredItems = items;
         if (lowStockOnly) {
             filteredItems = items.filter(
@@ -152,12 +150,10 @@ export class InventoryRepository {
                 where: { inventoryId: inventory.id },
                 _sum: { quantity: true },
             }),
-            // Count low stock items (compare quantity vs product.minStock in app layer)
             this.prisma.inventoryItem.findMany({
                 where: { inventoryId: inventory.id },
                 include: { product: { select: { minStock: true } } },
             }),
-            // Items expiring within 30 days
             this.prisma.inventoryItem.count({
                 where: {
                     inventoryId: inventory.id,

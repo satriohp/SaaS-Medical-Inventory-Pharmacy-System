@@ -28,9 +28,6 @@ export class TenantService {
         private readonly prisma: PrismaService,
     ) { }
 
-    /**
-     * Get tenant details with member count and stats.
-     */
     async getTenantInfo(tenantId: string) {
         const tenant = await this.tenantRepository.findById(tenantId);
         if (!tenant) {
@@ -52,9 +49,6 @@ export class TenantService {
         };
     }
 
-    /**
-     * Update tenant settings. Only OWNER and ADMIN can do this.
-     */
     async updateTenant(tenantId: string, dto: UpdateTenantDto) {
         if (dto.slug) {
             const existing = await this.tenantRepository.findBySlug(dto.slug);
@@ -68,33 +62,22 @@ export class TenantService {
         return updated;
     }
 
-    /**
-     * List all active members of the tenant.
-     */
     async getMembers(tenantId: string) {
         return this.tenantRepository.getMembers(tenantId);
     }
 
-    /**
-     * Add a user to the tenant by email.
-     */
     async addMember(tenantId: string, dto: AddMemberDto) {
-        // Find user by email
-        const user = await this.prisma.user.findUnique({
-            where: { email: dto.email },
-        });
+        const user = await this.prisma.user.findUnique({ where: { email: dto.email } });
 
         if (!user) {
             throw new NotFoundException(`User with email ${dto.email} not found. They must register first.`);
         }
 
-        // Check if already a member
         const existing = await this.tenantRepository.findMembership(tenantId, user.id);
         if (existing && existing.isActive) {
             throw new ConflictException('User is already a member of this tenant');
         }
 
-        // Reactivate if previously removed
         if (existing && !existing.isActive) {
             return this.prisma.tenantUser.update({
                 where: { id: existing.id },
@@ -107,16 +90,7 @@ export class TenantService {
         return membership;
     }
 
-    /**
-     * Update a member's role within the tenant.
-     */
-    async updateMemberRole(
-        tenantId: string,
-        targetUserId: string,
-        role: Role,
-        requestingUserId: string,
-    ) {
-        // Cannot change your own role
+    async updateMemberRole(tenantId: string, targetUserId: string, role: Role, requestingUserId: string) {
         if (targetUserId === requestingUserId) {
             throw new ForbiddenException('Cannot change your own role');
         }
@@ -129,14 +103,7 @@ export class TenantService {
         return this.tenantRepository.updateMemberRole(tenantId, targetUserId, role);
     }
 
-    /**
-     * Remove a member from the tenant (soft delete).
-     */
-    async removeMember(
-        tenantId: string,
-        targetUserId: string,
-        requestingUserId: string,
-    ) {
+    async removeMember(tenantId: string, targetUserId: string, requestingUserId: string) {
         if (targetUserId === requestingUserId) {
             throw new ForbiddenException('Cannot remove yourself from the tenant');
         }

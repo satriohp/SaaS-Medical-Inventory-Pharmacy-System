@@ -19,10 +19,6 @@ import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { Role } from '@prisma/client';
 import { z } from 'zod';
 
-// ============================================================================
-// ZOD SCHEMAS
-// ============================================================================
-
 const createProductSchema = z.object({
     name: z.string().min(2, 'Product name must be at least 2 characters').max(200),
     sku: z
@@ -45,10 +41,6 @@ const updateProductSchema = z.object({
     minStock: z.number().int().min(0).optional(),
     isActive: z.boolean().optional(),
 });
-
-// ============================================================================
-// CONTROLLER
-// ============================================================================
 
 @Controller('products')
 @UseGuards(JwtGuard, TenantGuard)

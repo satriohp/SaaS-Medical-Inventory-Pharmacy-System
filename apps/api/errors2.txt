@@ -1,0 +1,92 @@
+src/common/guards/tenant.guard.ts(21,46): error TS2339: Property 'tenantUser' does not exist on type 'PrismaService'.
+src/common/guards/tenant.guard.ts(39,32): error TS2339: Property 'isActive' does not exist on type '{ id: string; createdAt: Date; name: string; }'.
+src/common/interceptors/logging.interceptor.ts(40,47): error TS2339: Property 'auditLog' does not exist on type 'PrismaService'.
+src/modules/audit/audit.repository.ts(9,31): error TS2724: '"C:/Users/user/Desktop/Final Project/SaaS-Medical-Inventory-Pharmacy-System/apps/api/node_modules/.prisma/client/index".Prisma' has no exported member named 'AuditLogUncheckedCreateInput'. Did you mean 'TenantUncheckedCreateInput'?
+src/modules/audit/audit.repository.ts(10,28): error TS2339: Property 'auditLog' does not exist on type 'PrismaService'.
+src/modules/audit/audit.repository.ts(27,29): error TS2694: Namespace '"C:/Users/user/Desktop/Final Project/SaaS-Medical-Inventory-Pharmacy-System/apps/api/node_modules/.prisma/client/index".Prisma' has no exported member 'AuditLogWhereInput'.
+src/modules/audit/audit.repository.ts(43,25): error TS2339: Property 'auditLog' does not exist on type 'PrismaService'.
+src/modules/audit/audit.repository.ts(49,25): error TS2339: Property 'auditLog' does not exist on type 'PrismaService'.
+src/modules/auth/auth.module.ts(12,28): error TS2322: Type 'string' is not assignable to type 'number | StringValue | undefined'.
+src/modules/auth/auth.repository.ts(13,17): error TS2561: Object literal may only specify known properties, but 'tenants' does not exist in type 'UserInclude<DefaultArgs>'. Did you mean to write 'tenant'?
+src/modules/auth/auth.repository.ts(25,17): error TS2561: Object literal may only specify known properties, but 'tenants' does not exist in type 'UserInclude<DefaultArgs>'. Did you mean to write 'tenant'?
+src/modules/auth/auth.repository.ts(37,17): error TS2561: Object literal may only specify known properties, but 'tenants' does not exist in type 'UserInclude<DefaultArgs>'. Did you mean to write 'tenant'?
+src/modules/auth/auth.repository.ts(51,28): error TS2339: Property 'refreshToken' does not exist on type 'PrismaService'.
+src/modules/auth/auth.repository.ts(55,28): error TS2339: Property 'refreshToken' does not exist on type 'PrismaService'.
+src/modules/auth/auth.repository.ts(62,28): error TS2339: Property 'refreshToken' does not exist on type 'PrismaService'.
+src/modules/auth/auth.repository.ts(69,28): error TS2339: Property 'refreshToken' does not exist on type 'PrismaService'.
+src/modules/auth/auth.repository.ts(76,28): error TS2339: Property 'refreshToken' does not exist on type 'PrismaService'.
+src/modules/auth/auth.service.ts(79,21): error TS2561: Object literal may only specify known properties, but 'passwordHash' does not exist in type '(Without<UserCreateInput, UserUncheckedCreateInput> & UserUncheckedCreateInput) | (Without<...> & UserCreateInput)'. Did you mean to write 'password'?
+src/modules/auth/auth.service.ts(88,21): error TS2353: Object literal may only specify known properties, and 'slug' does not exist in type '(Without<TenantCreateInput, TenantUncheckedCreateInput> & TenantUncheckedCreateInput) | (Without<...> & TenantCreateInput)'.
+src/modules/auth/auth.service.ts(93,41): error TS2339: Property 'tenantUser' does not exist on type 'Omit<PrismaClient<PrismaClientOptions, never, DefaultArgs>, "$on" | "$connect" | "$disconnect" | "$transaction" | "$extends">'.
+src/modules/auth/auth.service.ts(105,21): error TS2353: Object literal may only specify known properties, and 'name' does not exist in type 'Without<InventoryCreateInput, InventoryUncheckedCreateInput> & InventoryUncheckedCreateInput'.
+src/modules/auth/auth.service.ts(126,35): error TS2339: Property 'name' does not exist on type '{ id: string; email: string; password: string; role: Role; createdAt: Date; tenantId: string; }'.
+src/modules/auth/auth.service.ts(131,37): error TS2339: Property 'slug' does not exist on type '{ id: string; createdAt: Date; name: string; }'.
+src/modules/auth/auth.service.ts(147,19): error TS2339: Property 'isActive' does not exist on type '{ id: string; email: string; password: string; role: Role; createdAt: Date; tenantId: string; }'.
+src/modules/auth/auth.service.ts(152,73): error TS2551: Property 'passwordHash' does not exist on type '{ id: string; email: string; password: string; role: Role; createdAt: Date; tenantId: string; }'. Did you mean 'password'?
+src/modules/auth/auth.service.ts(158,36): error TS2339: Property 'tenants' does not exist on type '{ id: string; email: string; password: string; role: Role; createdAt: Date; tenantId: string; }'.
+src/modules/auth/auth.service.ts(204,28): error TS2339: Property 'name' does not exist on type '{ id: string; email: string; password: string; role: Role; createdAt: Date; tenantId: string; }'.
+src/modules/auth/auth.service.ts(232,28): error TS2339: Property 'isActive' does not exist on type '{ id: string; email: string; password: string; role: Role; createdAt: Date; tenantId: string; }'.
+src/modules/auth/auth.service.ts(236,39): error TS2339: Property 'tenants' does not exist on type '{ id: string; email: string; password: string; role: Role; createdAt: Date; tenantId: string; }'.
+src/modules/auth/auth.service.ts(253,28): error TS2339: Property 'name' does not exist on type '{ id: string; email: string; password: string; role: Role; createdAt: Date; tenantId: string; }'.
+src/modules/auth/auth.service.ts(277,33): error TS2339: Property 'tenants' does not exist on type '{ id: string; email: string; password: string; role: Role; createdAt: Date; tenantId: string; }'.
+src/modules/auth/auth.service.ts(282,24): error TS2339: Property 'name' does not exist on type '{ id: string; email: string; password: string; role: Role; createdAt: Date; tenantId: string; }'.
+src/modules/auth/auth.service.ts(301,29): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(payload: string, options?: Omit<JwtSignOptions, keyof SignOptions> | undefined): Promise<string>', gave the following error.
+    Argument of type 'JwtPayload' is not assignable to parameter of type 'string'.
+  Overload 2 of 3, '(payload: Buffer<ArrayBufferLike>, options?: JwtSignOptions | undefined): Promise<string>', gave the following error.
+    Argument of type 'JwtPayload' is not assignable to parameter of type 'Buffer<ArrayBufferLike>'.
+      Type 'JwtPayload' is missing the following properties from type 'Buffer<ArrayBufferLike>': slice, subarray, write, toJSON, and 97 more.
+  Overload 3 of 3, '(payload: JwtPayload, options?: JwtSignOptions | undefined): Promise<string>', gave the following error.
+    Type 'string' is not assignable to type 'number | StringValue | undefined'.
+src/modules/inventory/inventory.repository.ts(11,24): error TS2353: Object literal may only specify known properties, and 'createdAt' does not exist in type 'InventoryOrderByWithRelationInput | InventoryOrderByWithRelationInput[]'.
+src/modules/inventory/inventory.repository.ts(21,21): error TS2353: Object literal may only specify known properties, and 'name' does not exist in type 'Without<InventoryCreateInput, InventoryUncheckedCreateInput> & InventoryUncheckedCreateInput'.
+src/modules/inventory/inventory.repository.ts(48,25): error TS2551: Property 'inventoryItem' does not exist on type 'PrismaService'. Did you mean 'inventory'?
+src/modules/inventory/inventory.repository.ts(67,25): error TS2551: Property 'inventoryItem' does not exist on type 'PrismaService'. Did you mean 'inventory'?
+src/modules/inventory/inventory.repository.ts(74,18): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/modules/inventory/inventory.repository.ts(80,38): error TS2339: Property 'name' does not exist on type '{ id: string; tenantId: string; quantity: number; updatedAt: Date; productId: string; }'.
+src/modules/inventory/inventory.repository.ts(81,39): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/modules/inventory/inventory.repository.ts(105,28): error TS2551: Property 'inventoryItem' does not exist on type 'PrismaService'. Did you mean 'inventory'?
+src/modules/inventory/inventory.repository.ts(124,32): error TS2551: Property 'inventoryItem' does not exist on type 'PrismaService'. Did you mean 'inventory'?
+src/modules/inventory/inventory.repository.ts(134,28): error TS2551: Property 'inventoryItem' does not exist on type 'PrismaService'. Did you mean 'inventory'?
+src/modules/inventory/inventory.repository.ts(150,60): error TS2353: Object literal may only specify known properties, and 'isActive' does not exist in type 'ProductWhereInput'.
+src/modules/inventory/inventory.repository.ts(151,25): error TS2551: Property 'inventoryItem' does not exist on type 'PrismaService'. Did you mean 'inventory'?
+src/modules/inventory/inventory.repository.ts(156,25): error TS2551: Property 'inventoryItem' does not exist on type 'PrismaService'. Did you mean 'inventory'?
+src/modules/inventory/inventory.repository.ts(161,25): error TS2551: Property 'inventoryItem' does not exist on type 'PrismaService'. Did you mean 'inventory'?
+src/modules/inventory/inventory.repository.ts(173,14): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/modules/inventory/inventory.repository.ts(177,14): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/modules/product/product.controller.ts(83,41): error TS2339: Property 'PHARMACIST' does not exist on type '{ OWNER: "OWNER"; ADMIN: "ADMIN"; STAFF: "STAFF"; }'.
+src/modules/product/product.controller.ts(93,41): error TS2339: Property 'PHARMACIST' does not exist on type '{ OWNER: "OWNER"; ADMIN: "ADMIN"; STAFF: "STAFF"; }'.
+src/modules/product/product.repository.ts(40,21): error TS2353: Object literal may only specify known properties, and 'inventoryItems' does not exist in type 'ProductInclude<DefaultArgs>'.
+src/modules/product/product.repository.ts(67,17): error TS2353: Object literal may only specify known properties, and 'inventoryItems' does not exist in type 'ProductInclude<DefaultArgs>'.
+src/modules/product/product.repository.ts(93,22): error TS2561: Object literal may only specify known properties, but 'tenantId_sku' does not exist in type 'ProductWhereUniqueInput'. Did you mean to write 'tenantId'?
+src/modules/product/product.repository.ts(111,21): error TS2353: Object literal may only specify known properties, and 'isActive' does not exist in type '(Without<ProductUpdateManyMutationInput, ProductUncheckedUpdateManyInput> & ProductUncheckedUpdateManyInput) | (Without<...> & ProductUpdateManyMutationInput)'.
+src/modules/product/product.service.ts(54,36): error TS2339: Property 'inventoryItems' does not exist on type '{ id: string; createdAt: Date; tenantId: string; name: string; sku: string; }'.
+src/modules/product/product.service.ts(55,14): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+src/modules/product/product.service.ts(55,19): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/modules/product/product.service.ts(62,46): error TS2339: Property 'minStock' does not exist on type '{ id: string; createdAt: Date; tenantId: string; name: string; sku: string; }'.
+src/modules/product/product.service.ts(76,13): error TS2353: Object literal may only specify known properties, and 'category' does not exist in type 'ProductCreateInput'.
+src/modules/stock-movement/stock-movement.controller.ts(18,16): error TS2305: Module '"@prisma/client"' has no exported member 'MovementType'.
+src/modules/stock-movement/stock-movement.controller.ts(76,41): error TS2339: Property 'PHARMACIST' does not exist on type '{ OWNER: "OWNER"; ADMIN: "ADMIN"; STAFF: "STAFF"; }'.
+src/modules/stock-movement/stock-movement.repository.ts(3,10): error TS2305: Module '"@prisma/client"' has no exported member 'MovementType'.
+src/modules/stock-movement/stock-movement.repository.ts(22,29): error TS2694: Namespace '"C:/Users/user/Desktop/Final Project/SaaS-Medical-Inventory-Pharmacy-System/apps/api/node_modules/.prisma/client/index".Prisma' has no exported member 'StockMovementWhereInput'.
+src/modules/stock-movement/stock-movement.repository.ts(37,25): error TS2339: Property 'stockMovement' does not exist on type 'PrismaService'.
+src/modules/stock-movement/stock-movement.repository.ts(53,25): error TS2339: Property 'stockMovement' does not exist on type 'PrismaService'.
+src/modules/stock-movement/stock-movement.repository.ts(68,28): error TS2339: Property 'stockMovement' does not exist on type 'PrismaService'.
+src/modules/stock-movement/stock-movement.repository.ts(98,28): error TS2339: Property 'stockMovement' does not exist on type 'PrismaService'.
+src/modules/stock-movement/stock-movement.service.ts(10,10): error TS2305: Module '"@prisma/client"' has no exported member 'MovementType'.
+src/modules/stock-movement/stock-movement.service.ts(77,22): error TS2339: Property 'isActive' does not exist on type '{ id: string; createdAt: Date; tenantId: string; name: string; sku: string; }'.
+src/modules/tenant/tenant.middleware.ts(32,32): error TS2339: Property 'isActive' does not exist on type '{ id: string; createdAt: Date; name: string; }'.
+src/modules/tenant/tenant.repository.ts(14,32): error TS2353: Object literal may only specify known properties, and 'user' does not exist in type 'UserInclude<DefaultArgs>'.
+src/modules/tenant/tenant.repository.ts(15,30): error TS2353: Object literal may only specify known properties, and 'isActive' does not exist in type 'UserWhereInput'.
+src/modules/tenant/tenant.repository.ts(20,25): error TS2353: Object literal may only specify known properties, and 'movements' does not exist in type 'TenantCountOutputTypeSelect<DefaultArgs>'.
+src/modules/tenant/tenant.repository.ts(29,22): error TS2353: Object literal may only specify known properties, and 'slug' does not exist in type 'TenantWhereUniqueInput'.
+src/modules/tenant/tenant.repository.ts(41,28): error TS2339: Property 'tenantUser' does not exist on type 'PrismaService'.
+src/modules/tenant/tenant.repository.ts(59,28): error TS2339: Property 'tenantUser' does not exist on type 'PrismaService'.
+src/modules/tenant/tenant.repository.ts(66,28): error TS2339: Property 'tenantUser' does not exist on type 'PrismaService'.
+src/modules/tenant/tenant.repository.ts(73,28): error TS2339: Property 'tenantUser' does not exist on type 'PrismaService'.
+src/modules/tenant/tenant.repository.ts(80,28): error TS2339: Property 'tenantUser' does not exist on type 'PrismaService'.
+src/modules/tenant/tenant.service.ts(43,26): error TS2339: Property 'slug' does not exist on type '{ id: string; createdAt: Date; name: string; }'.
+src/modules/tenant/tenant.service.ts(44,26): error TS2339: Property 'plan' does not exist on type '{ id: string; createdAt: Date; name: string; }'.
+src/modules/tenant/tenant.service.ts(45,30): error TS2339: Property 'isActive' does not exist on type '{ id: string; createdAt: Date; name: string; }'.
+src/modules/tenant/tenant.service.ts(48,38): error TS2339: Property 'users' does not exist on type '{ id: string; createdAt: Date; name: string; }'.
+src/modules/tenant/tenant.service.ts(99,32): error TS2339: Property 'tenantUser' does not exist on type 'PrismaService'.

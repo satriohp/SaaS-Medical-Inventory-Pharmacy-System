@@ -8,10 +8,6 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 
-/**
- * GlobalExceptionFilter — catches ALL exceptions, formats consistent error responses.
- * Ensures no sensitive data (stack traces, internal details) leaks to clients.
- */
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
     private readonly logger = new Logger(GlobalExceptionFilter.name);
@@ -36,26 +32,17 @@ export class GlobalExceptionFilter implements ExceptionFilter {
                 message = errObj.message || message;
                 errors = errObj.errors;
 
-                // Handle NestJS validation pipe errors (array of messages)
                 if (Array.isArray(errObj.message)) {
                     message = 'Validation failed';
                     errors = errObj.message;
                 }
             }
         } else if (exception instanceof Error) {
-            // Log unexpected errors with full stack trace for debugging
-            this.logger.error(
-                `Unhandled exception: ${exception.message}`,
-                exception.stack,
-            );
-            // Don't expose internal error details to client
+            this.logger.error(`Unhandled exception: ${exception.message}`, exception.stack);
             message = 'Internal server error';
         }
 
-        // Always log the request details for tracing
-        this.logger.warn(
-            `[${request.method}] ${request.url} → ${status} | ${message}`,
-        );
+        this.logger.warn(`[${request.method}] ${request.url} → ${status} | ${message}`);
 
         response.status(status).json({
             success: false,

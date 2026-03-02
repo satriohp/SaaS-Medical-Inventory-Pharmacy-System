@@ -14,7 +14,7 @@ export interface CreateMovementDto {
     type: MovementType;
     quantity: number;
     batchNumber?: string;
-    expiryDate?: string; // ISO string from client
+    expiryDate?: string;
     reference?: string;
     notes?: string;
 }
@@ -58,17 +58,7 @@ export class StockMovementService {
         return movement;
     }
 
-    /**
-     * Create a stock movement entry and update inventory.
-     *
-     * Flow:
-     * 1. Validate product exists in tenant
-     * 2. Create immutable StockMovement record
-     * 3. Update InventoryItem quantity (+ or -)
-     * 4. Threshold check → event emission (handled by InventoryService)
-     */
     async create(tenantId: string, userId: string, dto: CreateMovementDto) {
-        // 1. Validate product exists within tenant
         const product = await this.productRepository.findById(tenantId, dto.productId);
         if (!product) {
             throw new NotFoundException('Product not found in this tenant');
@@ -78,15 +68,12 @@ export class StockMovementService {
             throw new BadRequestException('Cannot create movement for inactive product');
         }
 
-        // 2. Validate quantity
         if (dto.quantity <= 0) {
             throw new BadRequestException('Quantity must be a positive number');
         }
 
-        // 3. Calculate quantity change based on movement type
         const quantityChange = this.calculateQuantityChange(dto.type, dto.quantity);
 
-        // 4. Create immutable stock movement record
         const movement = await this.stockMovementRepository.create({
             tenantId,
             productId: dto.productId,
@@ -99,7 +86,6 @@ export class StockMovementService {
             performedBy: userId,
         });
 
-        // 5. Update inventory (triggers threshold events internally)
         const updatedInventoryItem = await this.inventoryService.updateStock(
             tenantId,
             dto.productId,
@@ -109,7 +95,7 @@ export class StockMovementService {
         );
 
         this.logger.log(
-            `Stock movement: ${dto.type} ${dto.quantity} x ${product.name} (${product.sku}) | Tenant: ${tenantId} | User: ${userId}`,
+            `Movement: ${dto.type} ${dto.quantity} x ${product.name} (${product.sku}) | Tenant: ${tenantId}`,
         );
 
         return {
@@ -123,10 +109,6 @@ export class StockMovementService {
         };
     }
 
-    /**
-     * Create a compensating entry (correction).
-     * Since movements are IMMUTABLE, corrections are new entries with type ADJUSTMENT.
-     */
     async createCompensatingEntry(
         tenantId: string,
         userId: string,
@@ -138,9 +120,6 @@ export class StockMovementService {
             throw new NotFoundException('Original movement not found');
         }
 
-        // Create reverse movement
-        const reverseType = original.type === MovementType.IN ? MovementType.OUT : MovementType.IN;
-
         return this.create(tenantId, userId, {
             productId: original.productId,
             type: MovementType.ADJUSTMENT,
@@ -151,20 +130,16 @@ export class StockMovementService {
         });
     }
 
-    // ============================================================================
-    // PRIVATE HELPERS
-    // ============================================================================
-
     private calculateQuantityChange(type: MovementType, quantity: number): number {
         switch (type) {
             case MovementType.IN:
             case MovementType.RETURN:
-                return quantity; // Increase stock
+                return quantity;
             case MovementType.OUT:
             case MovementType.EXPIRED:
-                return -quantity; // Decrease stock
+                return -quantity;
             case MovementType.ADJUSTMENT:
-                return quantity; // Can be + or -, but quantity is always positive in record
+                return quantity;
             default:
                 throw new BadRequestException(`Unknown movement type: ${type}`);
         }

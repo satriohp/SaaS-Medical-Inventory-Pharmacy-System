@@ -18,10 +18,6 @@ import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { Role, MovementType } from '@prisma/client';
 import { z } from 'zod';
 
-// ============================================================================
-// ZOD SCHEMAS
-// ============================================================================
-
 const createMovementSchema = z.object({
     productId: z.string().min(1, 'Product ID is required'),
     type: z.nativeEnum(MovementType),
@@ -36,10 +32,6 @@ const compensatingSchema = z.object({
     originalMovementId: z.string().min(1, 'Original movement ID is required'),
     notes: z.string().min(1, 'Notes are required for compensating entries').max(1000),
 });
-
-// ============================================================================
-// CONTROLLER — NO UPDATE OR DELETE ENDPOINTS (IMMUTABLE LEDGER)
-// ============================================================================
 
 @Controller('stock-movements')
 @UseGuards(JwtGuard, TenantGuard)

@@ -2,10 +2,6 @@ import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 
-/**
- * JwtGuard — validates JWT access token from Authorization header.
- * Extracts user payload and attaches to request.
- */
 @Injectable()
 export class JwtGuard implements CanActivate {
     constructor(private readonly jwtService: JwtService) { }
@@ -22,7 +18,6 @@ export class JwtGuard implements CanActivate {
             const payload = await this.jwtService.verifyAsync(token, {
                 secret: process.env.JWT_SECRET,
             });
-            // Attach user payload to request for downstream use
             (request as any).user = payload;
         } catch {
             throw new UnauthorizedException('Invalid or expired access token');

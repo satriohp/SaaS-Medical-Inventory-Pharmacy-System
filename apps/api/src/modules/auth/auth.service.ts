@@ -11,10 +11,6 @@ import { AuthRepository } from './auth.repository';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Role } from '@prisma/client';
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
 export interface RegisterDto {
     email: string;
     password: string;
@@ -30,7 +26,7 @@ export interface LoginDto {
 }
 
 export interface JwtPayload {
-    sub: string;        // userId
+    sub: string;
     email: string;
     tenantId: string;
     role: Role;
@@ -40,10 +36,6 @@ export interface AuthTokens {
     accessToken: string;
     refreshToken: string;
 }
-
-// ============================================================================
-// SERVICE
-// ============================================================================
 
 @Injectable()
 export class AuthService {
@@ -56,60 +48,34 @@ export class AuthService {
         private readonly prisma: PrismaService,
     ) { }
 
-    /**
-     * Register a new user + create their first tenant.
-     * The registering user becomes the OWNER of the new tenant.
-     */
     async register(dto: RegisterDto) {
-        // Check if email already exists
         const existingUser = await this.authRepository.findUserByEmail(dto.email);
         if (existingUser) {
             throw new ConflictException('Email already registered');
         }
 
-        // Hash password
         const passwordHash = await bcrypt.hash(dto.password, this.BCRYPT_ROUNDS);
 
-        // Create user, tenant, and membership in a transaction
         const result = await this.prisma.$transaction(async (tx) => {
-            // 1. Create user
             const user = await tx.user.create({
-                data: {
-                    email: dto.email,
-                    passwordHash,
-                    name: dto.name,
-                },
+                data: { email: dto.email, passwordHash, name: dto.name },
             });
 
-            // 2. Create tenant
             const tenant = await tx.tenant.create({
-                data: {
-                    name: dto.tenantName,
-                    slug: dto.tenantSlug,
-                },
+                data: { name: dto.tenantName, slug: dto.tenantSlug },
             });
 
-            // 3. Create tenant membership (OWNER role)
             const tenantUser = await tx.tenantUser.create({
-                data: {
-                    userId: user.id,
-                    tenantId: tenant.id,
-                    role: Role.OWNER,
-                },
+                data: { userId: user.id, tenantId: tenant.id, role: Role.OWNER },
             });
 
-            // 4. Create default inventory for the tenant
             await tx.inventory.create({
-                data: {
-                    tenantId: tenant.id,
-                    name: 'Main Warehouse',
-                },
+                data: { tenantId: tenant.id, name: 'Main Warehouse' },
             });
 
             return { user, tenant, tenantUser };
         });
 
-        // Generate tokens
         const tokens = await this.generateTokens({
             sub: result.user.id,
             email: result.user.email,
@@ -120,24 +86,12 @@ export class AuthService {
         this.logger.log(`User registered: ${dto.email} | Tenant: ${dto.tenantSlug}`);
 
         return {
-            user: {
-                id: result.user.id,
-                email: result.user.email,
-                name: result.user.name,
-            },
-            tenant: {
-                id: result.tenant.id,
-                name: result.tenant.name,
-                slug: result.tenant.slug,
-            },
+            user: { id: result.user.id, email: result.user.email, name: result.user.name },
+            tenant: { id: result.tenant.id, name: result.tenant.name, slug: result.tenant.slug },
             ...tokens,
         };
     }
 
-    /**
-     * Authenticate user with email + password.
-     * If user belongs to multiple tenants, tenantId must be provided.
-     */
     async login(dto: LoginDto) {
         const user = await this.authRepository.findUserByEmail(dto.email);
         if (!user) {
@@ -148,13 +102,11 @@ export class AuthService {
             throw new UnauthorizedException('Account is deactivated');
         }
 
-        // Verify password
         const isPasswordValid = await bcrypt.compare(dto.password, user.passwordHash);
         if (!isPasswordValid) {
             throw new UnauthorizedException('Invalid email or password');
         }
 
-        // Determine tenant
         const activeTenants = user.tenants.filter(
             (tu: any) => tu.isActive && tu.tenant.isActive,
         );
@@ -166,16 +118,13 @@ export class AuthService {
         let selectedMembership: any;
 
         if (dto.tenantId) {
-            // Specific tenant requested
             selectedMembership = activeTenants.find((tu: any) => tu.tenantId === dto.tenantId);
             if (!selectedMembership) {
                 throw new UnauthorizedException('You are not a member of the specified tenant');
             }
         } else if (activeTenants.length === 1) {
-            // Auto-select single tenant
             selectedMembership = activeTenants[0];
         } else {
-            // Multiple tenants — return tenant list for selection
             return {
                 requireTenantSelection: true,
                 tenants: activeTenants.map((tu: any) => ({
@@ -187,7 +136,6 @@ export class AuthService {
             };
         }
 
-        // Generate tokens
         const tokens = await this.generateTokens({
             sub: user.id,
             email: user.email,
@@ -198,11 +146,7 @@ export class AuthService {
         this.logger.log(`User logged in: ${dto.email} | Tenant: ${selectedMembership.tenantId}`);
 
         return {
-            user: {
-                id: user.id,
-                email: user.email,
-                name: user.name,
-            },
+            user: { id: user.id, email: user.email, name: user.name },
             tenant: {
                 id: selectedMembership.tenant.id,
                 name: selectedMembership.tenant.name,
@@ -213,10 +157,6 @@ export class AuthService {
         };
     }
 
-    /**
-     * Refresh access token using a valid refresh token.
-     * Implements refresh token rotation — old token is revoked.
-     */
     async refreshTokens(refreshToken: string) {
         const storedToken = await this.authRepository.findRefreshToken(refreshToken);
 
@@ -224,10 +164,8 @@ export class AuthService {
             throw new UnauthorizedException('Invalid or expired refresh token');
         }
 
-        // Revoke the old refresh token (rotation)
         await this.authRepository.revokeRefreshToken(refreshToken);
 
-        // Find user's active tenant membership
         const user = await this.authRepository.findUserById(storedToken.userId);
         if (!user || !user.isActive) {
             throw new UnauthorizedException('User account is deactivated');
@@ -238,7 +176,6 @@ export class AuthService {
             throw new UnauthorizedException('No active tenant membership');
         }
 
-        // Generate new tokens
         const tokens = await this.generateTokens({
             sub: user.id,
             email: user.email,
@@ -247,27 +184,17 @@ export class AuthService {
         });
 
         return {
-            user: {
-                id: user.id,
-                email: user.email,
-                name: user.name,
-            },
+            user: { id: user.id, email: user.email, name: user.name },
             ...tokens,
         };
     }
 
-    /**
-     * Logout — revoke all refresh tokens for the user.
-     */
     async logout(userId: string) {
         await this.authRepository.revokeAllUserTokens(userId);
         this.logger.log(`User logged out: ${userId}`);
         return { message: 'Logged out successfully' };
     }
 
-    /**
-     * Get current user profile with tenant info.
-     */
     async getProfile(userId: string, tenantId: string) {
         const user = await this.authRepository.findUserById(userId);
         if (!user) {
@@ -292,16 +219,15 @@ export class AuthService {
         };
     }
 
-    // ============================================================================
-    // PRIVATE HELPERS
-    // ============================================================================
-
     private async generateTokens(payload: JwtPayload): Promise<AuthTokens> {
         const [accessToken, refreshToken] = await Promise.all([
-            this.jwtService.signAsync(payload, {
-                secret: process.env.JWT_SECRET,
-                expiresIn: process.env.JWT_EXPIRY || '15m',
-            }),
+            this.jwtService.signAsync(
+                { sub: payload.sub, email: payload.email, tenantId: payload.tenantId, role: payload.role },
+                {
+                    secret: process.env.JWT_SECRET || 'fallback-secret-change-in-production',
+                    expiresIn: '15m' as const,
+                },
+            ),
             this.createRefreshToken(payload.sub),
         ]);
 
@@ -311,13 +237,9 @@ export class AuthService {
     private async createRefreshToken(userId: string): Promise<string> {
         const token = randomBytes(64).toString('hex');
         const expiresAt = new Date();
-        expiresAt.setDate(expiresAt.getDate() + 7); // 7 days
+        expiresAt.setDate(expiresAt.getDate() + 7);
 
-        await this.authRepository.createRefreshToken({
-            token,
-            userId,
-            expiresAt,
-        });
+        await this.authRepository.createRefreshToken({ token, userId, expiresAt });
 
         return token;
     }

@@ -1,19 +1,12 @@
 import { ThrottlerModuleOptions } from '@nestjs/throttler';
 
-/**
- * Rate limiting configuration
- * Default: 100 requests per 60 seconds per IP
- */
 export const throttlerConfig: ThrottlerModuleOptions = [
     {
-        ttl: 60000,   // 60 seconds
-        limit: 100,   // max requests per window
+        ttl: 60000,
+        limit: 100,
     },
 ];
 
-/**
- * CORS configuration factory
- */
 export function corsConfig(origin: string) {
     return {
         origin: origin.split(',').map((o) => o.trim()),
@@ -21,6 +14,6 @@ export function corsConfig(origin: string) {
         credentials: true,
         allowedHeaders: ['Content-Type', 'Authorization', 'X-Tenant-Id'],
         exposedHeaders: ['X-Total-Count'],
-        maxAge: 86400, // 24 hours
+        maxAge: 86400,
     };
 }

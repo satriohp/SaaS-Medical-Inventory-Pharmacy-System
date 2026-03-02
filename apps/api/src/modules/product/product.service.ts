@@ -50,11 +50,7 @@ export class ProductService {
             throw new NotFoundException('Product not found');
         }
 
-        // Calculate total stock across all inventory items
-        const totalStock = product.inventoryItems.reduce(
-            (sum, item) => sum + item.quantity,
-            0,
-        );
+        const totalStock = product.inventoryItems.reduce((sum, item) => sum + item.quantity, 0);
 
         return {
             ...product,
@@ -64,7 +60,6 @@ export class ProductService {
     }
 
     async create(tenantId: string, dto: CreateProductDto) {
-        // Check SKU uniqueness within tenant
         const existing = await this.productRepository.findBySku(tenantId, dto.sku);
         if (existing) {
             throw new ConflictException(`SKU "${dto.sku}" already exists in this tenant`);
@@ -85,13 +80,11 @@ export class ProductService {
     }
 
     async update(tenantId: string, id: string, dto: UpdateProductDto) {
-        // Verify product exists
         const existing = await this.productRepository.findById(tenantId, id);
         if (!existing) {
             throw new NotFoundException('Product not found');
         }
 
-        // Check SKU uniqueness if changing
         if (dto.sku && dto.sku !== existing.sku) {
             const skuConflict = await this.productRepository.findBySku(tenantId, dto.sku);
             if (skuConflict) {

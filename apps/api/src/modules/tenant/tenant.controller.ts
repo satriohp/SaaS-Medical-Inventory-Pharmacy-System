@@ -19,10 +19,6 @@ import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { Role } from '@prisma/client';
 import { z } from 'zod';
 
-// ============================================================================
-// ZOD SCHEMAS
-// ============================================================================
-
 const updateTenantSchema = z.object({
     name: z.string().min(2).max(100).optional(),
     slug: z
@@ -41,10 +37,6 @@ const addMemberSchema = z.object({
 const updateRoleSchema = z.object({
     role: z.nativeEnum(Role),
 });
-
-// ============================================================================
-// CONTROLLER
-// ============================================================================
 
 @Controller('tenants')
 @UseGuards(JwtGuard, TenantGuard)
@@ -90,12 +82,7 @@ export class TenantController {
         @CurrentUser('sub') requestingUserId: string,
         @Body(new ZodValidationPipe(updateRoleSchema)) body: { role: Role },
     ) {
-        return this.tenantService.updateMemberRole(
-            tenantId,
-            targetUserId,
-            body.role,
-            requestingUserId,
-        );
+        return this.tenantService.updateMemberRole(tenantId, targetUserId, body.role, requestingUserId);
     }
 
     @Delete('members/:userId')

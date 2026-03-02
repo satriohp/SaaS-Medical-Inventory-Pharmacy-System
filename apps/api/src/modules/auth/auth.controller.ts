@@ -13,10 +13,6 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { z } from 'zod';
 
-// ============================================================================
-// ZOD SCHEMAS
-// ============================================================================
-
 const registerSchema = z.object({
     email: z.string().email('Invalid email address'),
     password: z
@@ -43,34 +39,24 @@ const refreshSchema = z.object({
     refreshToken: z.string().min(1, 'Refresh token is required'),
 });
 
-// ============================================================================
-// CONTROLLER
-// ============================================================================
-
 @Controller('auth')
 export class AuthController {
     constructor(private readonly authService: AuthService) { }
 
     @Post('register')
-    async register(
-        @Body(new ZodValidationPipe(registerSchema)) dto: RegisterDto,
-    ) {
+    async register(@Body(new ZodValidationPipe(registerSchema)) dto: RegisterDto) {
         return this.authService.register(dto);
     }
 
     @Post('login')
     @HttpCode(HttpStatus.OK)
-    async login(
-        @Body(new ZodValidationPipe(loginSchema)) dto: LoginDto,
-    ) {
+    async login(@Body(new ZodValidationPipe(loginSchema)) dto: LoginDto) {
         return this.authService.login(dto);
     }
 
     @Post('refresh')
     @HttpCode(HttpStatus.OK)
-    async refresh(
-        @Body(new ZodValidationPipe(refreshSchema)) body: { refreshToken: string },
-    ) {
+    async refresh(@Body(new ZodValidationPipe(refreshSchema)) body: { refreshToken: string }) {
         return this.authService.refreshTokens(body.refreshToken);
     }
 

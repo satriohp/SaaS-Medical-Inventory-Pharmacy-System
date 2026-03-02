@@ -3,10 +3,6 @@ import { Reflector } from '@nestjs/core';
 import { Role } from '@prisma/client';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 
-/**
- * RoleGuard — checks if user's role matches the @Roles() decorator on the endpoint.
- * Must be used AFTER JwtGuard and TenantGuard (which attach user + tenantUser to request).
- */
 @Injectable()
 export class RoleGuard implements CanActivate {
     constructor(private readonly reflector: Reflector) { }
@@ -17,7 +13,6 @@ export class RoleGuard implements CanActivate {
             context.getClass(),
         ]);
 
-        // If no roles decorator, allow access (endpoint is open to all authenticated users)
         if (!requiredRoles || requiredRoles.length === 0) {
             return true;
         }

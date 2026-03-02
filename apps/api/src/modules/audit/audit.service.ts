@@ -7,9 +7,6 @@ export class AuditService {
 
     constructor(private readonly auditRepository: AuditRepository) { }
 
-    /**
-     * Create an audit log entry. Called from LoggingInterceptor or directly.
-     */
     async createLog(data: {
         tenantId: string;
         userId: string;
@@ -24,15 +21,11 @@ export class AuditService {
         try {
             return await this.auditRepository.create(data);
         } catch (error) {
-            // Audit logging should never break the main flow
             this.logger.error('Failed to create audit log entry', error);
             return null;
         }
     }
 
-    /**
-     * Get audit logs for a tenant with optional filters.
-     */
     async getLogs(
         tenantId: string,
         options?: {

@@ -2,9 +2,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InventoryRepository } from './inventory.repository';
 
-/**
- * Inventory events — emitted when stock levels change.
- */
 export const INVENTORY_EVENTS = {
     LOW_STOCK: 'inventory.low_stock',
     OUT_OF_STOCK: 'inventory.out_of_stock',
@@ -40,10 +37,6 @@ export class InventoryService {
         return this.inventoryRepository.getDashboardStats(tenantId);
     }
 
-    /**
-     * Update inventory after a stock movement.
-     * Emits threshold events if stock falls below minStock.
-     */
     async updateStock(
         tenantId: string,
         productId: string,
@@ -61,7 +54,6 @@ export class InventoryService {
             expiryDate,
         );
 
-        // Check threshold and emit events
         if (updatedItem.product) {
             const payload: StockAlertPayload = {
                 tenantId,
@@ -74,10 +66,10 @@ export class InventoryService {
 
             if (updatedItem.quantity <= 0) {
                 this.eventEmitter.emit(INVENTORY_EVENTS.OUT_OF_STOCK, payload);
-                this.logger.warn(`OUT OF STOCK: ${updatedItem.product.name} (${updatedItem.product.sku}) | Tenant: ${tenantId}`);
+                this.logger.warn(`OUT OF STOCK: ${updatedItem.product.name} | Tenant: ${tenantId}`);
             } else if (updatedItem.quantity < updatedItem.product.minStock) {
                 this.eventEmitter.emit(INVENTORY_EVENTS.LOW_STOCK, payload);
-                this.logger.warn(`LOW STOCK: ${updatedItem.product.name} (${updatedItem.product.sku}) = ${updatedItem.quantity} | Min: ${updatedItem.product.minStock} | Tenant: ${tenantId}`);
+                this.logger.warn(`LOW STOCK: ${updatedItem.product.name} = ${updatedItem.quantity} | Tenant: ${tenantId}`);
             }
 
             this.eventEmitter.emit(INVENTORY_EVENTS.STOCK_UPDATED, payload);
