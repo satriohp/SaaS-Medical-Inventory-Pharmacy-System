@@ -9,6 +9,4 @@ This folder contains architecture, security, and API documentation for the SaaS 
 | `SECURITY.md` | OWASP checklist, security controls implementation |
 | `API.md` | REST API endpoint documentation |
 
-## Architecture Reference
 
-See `architecture-blueprint.md` in the root for the full system design.
